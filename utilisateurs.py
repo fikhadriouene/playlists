@@ -19,6 +19,7 @@ def ajouter_utilisateur(nom_utilisateur,email) :
     except Exception as e:
         print ("Autre erreurs : ", e)
 
+# OK -> ajouter_utilisateur("Jean Marais","jean@marais.com")
 ajouter_utilisateur("Jean Marais","jean@marais.com")
 
 
@@ -40,14 +41,27 @@ def rechercher_utilisateur(id) :
     except Exception as e:
         print ("Autre erreurs : ", e)
 
+# OK -> rechercher_utilisateur(7)
+
+def affiche_row(row : dict) :
+    print ()
+    print (f"------ utilisateur {row['id_utilisateur']} ------- ")
+    print (f"nom utilisateur : ",row['nom_utilisateur'])
+    print (f"email : ",row['email'])
+    print (f"date inscription : ",row['date_inscription'])
+    print (f"------------------------------- ")
+    print ()
+    
+    
 
 def affiche_utilisateur(id) :
     try :
         with psycopg.connect(DSN) as conn:
-            with conn.cursor() as cur:
+            with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 cur.execute("select * from utilisateurs where id_utilisateur = %s ",(id,))
-                row = cur.fetchall()
-                print(row)
+                row = cur.fetchone()
+                affiche_row(row)
+                
     except psycopg.errors.SyntaxError as e: 
         print ("Erreur SQL : ", e)
     except psycopg.errors.UniqueViolation as e:
@@ -56,16 +70,19 @@ def affiche_utilisateur(id) :
         print ("Problème de connection :" , e)
     except Exception as e:
         print ("Autre erreurs : ", e)
+
+# OK -> affiche_utilisateur(7)
 
 # * Utilisateurs : rechercher par `nom_utilisateur`.
 
 def utilisateur_par_nom(nom) :
     try :
         with psycopg.connect(DSN) as conn:
-            with conn.cursor() as cur:
-                cur.execute("select * from nom where nom = %s ",(nom,))
-                row = cur.fetchall()
-                print(row)
+            with conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
+                cur.execute("select * from utilisateurs where nom_utilisateur = %s ",(nom,))
+                row = cur.fetchone()
+                affiche_utilisateur(row['id_utilisateur'])
+                
     except psycopg.errors.SyntaxError as e: 
         print ("Erreur SQL : ", e)
     except psycopg.errors.UniqueViolation as e:
@@ -74,6 +91,8 @@ def utilisateur_par_nom(nom) :
         print ("Problème de connection :" , e)
     except Exception as e:
         print ("Autre erreurs : ", e)
+
+# OK -> utilisateur_par_nom("Jean Marais")
 
 
 # ### 3. Mise à jour d’un enregistrement
@@ -94,16 +113,15 @@ def modifier_nom_utilisateur(id_utilisateur,nom) :
     except Exception as e:
         print ("Autre erreurs : ", e)
 
-#modifier_nom_utilisateur(1,'robert')    
+# OK -> modifier_nom_utilisateur(7,'Louis de funes')    
 
 
-def email_nom_utilisateur(id_utilisateur,email) :
+def modifier_email_utilisateur(id_utilisateur,email) :
     try :
         with psycopg.connect(DSN) as conn:
             with conn.cursor() as cur:
-                cur.execute("update utilisateur set email = %s where id_utilisateur = %s ",(email,id_utilisateur))
-                row = cur.fetchall()
-                print(row)
+                cur.execute("update utilisateurs set email = %s where id_utilisateur = %s ",(email,id_utilisateur))
+
     except psycopg.errors.SyntaxError as e: 
         print ("Erreur SQL : ", e)
     except psycopg.errors.UniqueViolation as e:
@@ -112,3 +130,22 @@ def email_nom_utilisateur(id_utilisateur,email) :
         print ("Problème de connection :" , e)
     except Exception as e:
         print ("Autre erreurs : ", e)
+
+# OK -> modifier_email_utilisateur(7,"louis@defunes.fr")
+
+def supprimer_utilisateur(id_utilisateur) :
+    try :
+        with psycopg.connect(DSN) as conn:
+            with conn.cursor() as cur:
+                cur.execute("delete from utilisateurs where id_utilisateur = %s ",(id_utilisateur,))
+                
+    except psycopg.errors.SyntaxError as e: 
+        print ("Erreur SQL : ", e)
+    except psycopg.errors.UniqueViolation as e:
+        print ("Violation Unique : ", e)
+    except psycopg.OperationalError as e:
+        print ("Problème de connection :" , e)
+    except Exception as e:
+        print ("Autre erreurs : ", e)
+        
+# OK -> supprimer_utilisateur(7)        

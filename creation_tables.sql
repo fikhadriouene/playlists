@@ -13,6 +13,9 @@ create table utilisateurs (
 	email varchar(255) not null,
 	date_inscription date
 );
+alter table utilisateurs
+alter column date_inscription
+set default to current_date 
 
 -- delete from utilisateurs;
 INSERT INTO utilisateurs (nom_utilisateur, email, date_inscription) VALUES

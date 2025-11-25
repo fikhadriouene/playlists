@@ -139,7 +139,6 @@ def modifier_chanson(id_chanson,champ,valeur) :
 
 #   * suppression de chansons existantes
    
-
 def supprimer_chanson(id_chanson):
     try :
         with psycopg.connect(DSN) as conn:
